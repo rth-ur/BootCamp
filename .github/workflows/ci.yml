@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout do codigo
         uses: actions/checkout@v3
 
       - name: Setup Python
@@ -15,16 +15,16 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
-        working-directory: netSafe
+      - name: Instalar dependencias (Busca inteligente)
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          find . -name "requirements.txt" -exec pip install -r {} \;
+          pip install pytest ruff
 
-      - name: Run lint
+      - name: Correr o Lint (Ruff)
         working-directory: netSafe
         run: python -m ruff check .
 
-      - name: Run tests
+      - name: Correr os Testes (Pytest)
         working-directory: netSafe
         run: python -m pytest
