@@ -27,10 +27,3 @@ jobs:
       - name: Run tests
         working-directory: netSafe
         run: python -m pytest
-
-        - name: Debug files
-  run: |
-    echo "RAIZ:"
-    dir
-    echo "NETSAFE:"
-    dir netSafe
