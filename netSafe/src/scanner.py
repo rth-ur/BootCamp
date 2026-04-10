@@ -27,7 +27,7 @@ def ping_host(ip):
             stdout=subprocess.DEVNULL
         )
         return output.returncode == 0
-    except Exception: 
+    except:
         return False
 
 
