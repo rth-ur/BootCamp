@@ -1,4 +1,0 @@
-pytest
-ruff
-typer
-rich
