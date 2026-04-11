@@ -30,15 +30,17 @@ O NetSafe é uma ferramenta simples em linha de comando (CLI) que permite ao usu
 
 ## 📥 Instalação
 
-1. Clone o repositório:
+### 1. Clone o repositório:
 ```bash
 git clone [https://github.com/rth-ur/BootCamp.git](https://github.com/rth-ur/BootCamp.git)
 ```
-2. Acesse a pasta do projeto
+
+### 2. Acesse a pasta raiz do projeto:
 ```bash
-cd BootCamp/netSafe
+cd BootCamp
 ```
-3. Crie e ative um ambiente virtual
+
+### 3. Crie e ative um ambiente virtual:
 ```bash
 python -m venv venv
 
@@ -48,24 +50,30 @@ venv\Scripts\activate
 # Linux/macOS
 source venv/bin/activate
 ```
-4. Instale as dependêmcias:
+
+### 4. Instale as dependências:
 ```bash
 pip install -r requirements.txt
 ```
 
 ## 🚀 Como Executar
-
-Execute o script principal passando o IP base da sua rede. Exemplo:
-
+Com o ambiente virtual ativado na raiz do projeto, execute o script principal passando o IP base da sua rede. Exemplo:
 ```bash
-python src/main.py 192.168.1
+python netSafe/src/main.py 192.168.1
 ```
-## 🧹 Como Rodar o Linting
 
+## 🧪 Como Rodar os Testes
+Para garantir que o código está funcionando como esperado e cobrindo os cenários de uso (via Pytest), execute o comando abaixo na raiz do projeto:
+```bash
+python -m pytest netSafe/
+```
+
+## 🧹 Como Rodar o Linting
+Para verificar a padronização e a qualidade estática do código (via Ruff), execute:
 ```bash
 python -m ruff check .
 ```
 
 ## 👨‍💻 Autor e Repositório
-- Autor: Arthur Clemente
-- Repositório Público: https://github.com/rth-ur/BootCamp
+- **Autor:** Arthur Clemente
+- **Repositório Público:** https://github.com/rth-ur/BootCamp
