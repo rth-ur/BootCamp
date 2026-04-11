@@ -1,5 +1,9 @@
 # NetSafe - Verificador de Segurança de Redes Domésticas
 
+[![CI](https://github.com/rth-ur/BootCamp/actions/workflows/ci.yml/badge.svg)](https://github.com/rth-ur/BootCamp/actions/workflows/ci.yml)
+
+**Versão:** 1.0.0
+
 ## 📌 Descrição do Problema
 Muitas pessoas utilizam redes Wi-Fi domésticas sem saber quais dispositivos estão conectados ou quais portas estão abertas. Isso pode representar riscos de segurança, como acesso não autorizado ou exposição de serviços sensíveis.
 
@@ -26,9 +30,42 @@ O NetSafe é uma ferramenta simples em linha de comando (CLI) que permite ao usu
 
 ## 📥 Instalação
 
+1. Clone o repositório:
 ```bash
-git clone https://github.com/rth-ur/BootCamp.git
+git clone [https://github.com/rth-ur/BootCamp.git](https://github.com/rth-ur/BootCamp.git)
+```
+2. Acesse a pasta do projeto
+```bash
 cd BootCamp/netSafe
+```
+3. Crie e ative um ambiente virtual
+```bash
 python -m venv venv
+
+# Windows
 venv\Scripts\activate
+
+# Linux/macOS
+source venv/bin/activate
+```
+4. Instale as dependêmcias:
+```bash
 pip install -r requirements.txt
+```
+
+## 🚀 Como Executar
+
+Execute o script principal passando o IP base da sua rede. Exemplo:
+
+```bash
+python src/main.py 192.168.1
+```
+## 🧹 Como Rodar o Linting
+
+```bash
+python -m ruff check .
+```
+
+## 👨‍💻 Autor e Repositório
+- Autor: Arthur Clemente
+- Repositório Público: https://github.com/rth-ur/BootCamp
