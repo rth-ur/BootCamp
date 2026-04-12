@@ -32,7 +32,7 @@ O NetSafe é uma ferramenta simples em linha de comando (CLI) que permite ao usu
 
 ### 1. Clone o repositório:
 ```bash
-git clone [https://github.com/rth-ur/BootCamp.git](https://github.com/rth-ur/BootCamp.git)
+git clone https://github.com/rth-ur/BootCamp.git
 ```
 
 ### 2. Acesse a pasta raiz do projeto:
