@@ -58,10 +58,11 @@ pip install -r requirements.txt
 ```
 
 ## 🚀 Como Executar
-Com o ambiente virtual ativado na raiz do projeto, execute o script principal passando o IP base da sua rede. Exemplo:
+Com o ambiente virtual ativado na raiz do projeto, execute o script principal passando o *IP base da sua rede*. Exemplo:
 ```bash
 python netSafe/src/main.py 192.168.1
 ```
+🚨Importante: Substitua 192.168.1 pelo IP base da sua rede❗
 
 ## 🧪 Como Rodar os Testes
 Para garantir que o código está funcionando como esperado e cobrindo os cenários de uso (via Pytest), execute o comando abaixo na raiz do projeto:
