@@ -29,6 +29,7 @@ O NetSafe é uma ferramenta simples em linha de comando (CLI) que permite ao usu
 - Ruff (lint)
 
 ## 📥 Instalação
+Execute os comandos abaixo no seu terminal:
 
 ### 1. Clone o repositório:
 ```bash
