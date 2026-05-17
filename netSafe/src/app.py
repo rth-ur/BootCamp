@@ -9,7 +9,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.append(current_dir)
 
-# O '# noqa: E402' avisa ao Ruff para ignorar a regra de importação fora do topo, consertando o bug do Actions
+# O '# noqa: E402' avisa ao Ruff para ignorar a regra de importação fora do topo, mantendo o Actions verde
 from utils import classify_port  # noqa: E402
 
 st.set_page_config(page_title="NetSafe Web", page_icon="🛡️", layout="centered")
@@ -23,22 +23,34 @@ st.markdown("Clique no botão abaixo para consumir a API externa e identificar o
 
 if st.button("Buscar Dados do IP Externo"):
     with st.spinner("Conectando a serviços de geolocalização públicos..."):
+        # Descobre o IP real do usuário através do cabeçalho HTTP (Proxy/Forwarded)
+        try:
+            headers = st.context.headers
+            # O cabeçalho 'X-Forwarded-For' contém o IP real do cliente que acessa o servidor na nuvem
+            forwarded_ip = headers.get("X-Forwarded-For", "") or headers.get("x-forwarded-for", "")
+            client_ip = forwarded_ip.split(",")[0].strip() if forwarded_ip else ""
+        except Exception:
+            client_ip = ""
+
+        # Define as URLs passando o IP do usuário se ele for encontrado externamente
+        url_api1 = f"https://ipapi.co/{client_ip}/json/" if client_ip else "https://ipapi.co/json/"
+        url_api2 = f"http://ip-api.com/json/{client_ip}" if client_ip else "http://ip-api.com/json/"
+
         dados = None
         # Tenta a primeira API (ipapi.co)
         try:
-            response = requests.get("https://ipapi.co/json/", timeout=4)
+            response = requests.get(url_api1, timeout=4)
             if response.status_code == 200:
                 dados = response.json()
         except Exception:
             dados = None
 
         # Se a primeira falhar ou for bloqueada por limite, tenta a segunda de reserva (ip-api.com)
-        if not dados:
+        if not dados or "error" in dados:
             try:
-                response = requests.get("http://ip-api.com/json/", timeout=4)
+                response = requests.get(url_api2, timeout=4)
                 if response.status_code == 200:
                     res_json = response.json()
-                    # Padroniza as chaves para bater com o layout
                     dados = {
                         "ip": res_json.get("query"),
                         "city": res_json.get("city"),
@@ -52,6 +64,11 @@ if st.button("Buscar Dados do IP Externo"):
         # Exibe os resultados se alguma das duas APIs funcionar
         if dados and dados.get("ip"):
             st.success("Dados de geolocalização obtidos com sucesso!")
+            
+            # Alerta sutil caso esteja rodando localmente sem cabeçalhos de proxy
+            if not client_ip:
+                st.info("ℹ️ Nota: Mostrando o IP do servidor proxy devido à execução em ambiente de desenvolvimento local.")
+
             col1, col2 = st.columns(2)
             with col1:
                 st.metric("Seu IP Público", dados.get("ip"))
