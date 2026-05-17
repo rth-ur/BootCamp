@@ -1,5 +1,7 @@
 # NetSafe - Verificador de Segurança de Redes Domésticas
 
+🔗 **Link da Aplicação Web (Deploy):** (https://bootcamp-tto3pjgezxwiocg6fq444c.streamlit.app/#passo-1-informacoes-de-geolocalizacao-do-seu-ip)
+
 [![CI](https://github.com/rth-ur/BootCamp/actions/workflows/ci.yml/badge.svg)](https://github.com/rth-ur/BootCamp/actions/workflows/ci.yml)
 
 **Versão:** 1.0.0
