@@ -17,10 +17,9 @@ def test_classify_port_unknown():
     assert classify_port(9999) == ""
 
 
-# Teste de Integração Obrigatório com Mock (Exigência 1.3 do Barema)
+# Teste de Integração com Mock exigido na Etapa Intermediária
 @patch("requests.get")
 def test_integracao_api_geolocalizacao(mock_get):
-    # Simulamos uma resposta bem-sucedida (200 OK) da API externa
     mock_get.return_value.status_code = 200
     mock_get.return_value.json.return_value = {
         "ip": "127.0.0.1",
@@ -31,8 +30,6 @@ def test_integracao_api_geolocalizacao(mock_get):
     }
     
     response = requests.get("https://ipapi.co/json/", timeout=5)
-    
-    # Validações do fluxo de dados da API
     assert response.status_code == 200
     dados = response.json()
     assert "ip" in dados
