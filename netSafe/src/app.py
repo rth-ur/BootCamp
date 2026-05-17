@@ -3,6 +3,7 @@ import sys
 import socket
 import streamlit as st
 import requests
+from streamlit_javascript import st_javascript
 
 # Ajuste dinâmico de caminhos para funcionamento local e na nuvem
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -14,6 +15,10 @@ from utils import classify_port  # noqa: E402
 
 st.set_page_config(page_title="NetSafe Web", page_icon="🛡️", layout="centered")
 
+# Executa um fetch diretamente no browser do utilizador (Client-Side) para obter o IP público real.
+# Deve ficar fora do botão para evitar que o clique seja resetado pelo rerun do Streamlit.
+js_ip = st_javascript("fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => d.ip)")
+
 st.title("🛡️ NetSafe - Verificador de Segurança de Redes")
 st.markdown("Uma ferramenta web para analisar o contexto do seu IP público e verificar vulnerabilidades de portas expostas.")
 
@@ -22,27 +27,17 @@ st.subheader("🌐 Passo 1: Informações de Geolocalização do seu IP")
 st.markdown("Clique no botão abaixo para consumir a API externa e identificar os dados de rede do seu provedor.")
 
 if st.button("Buscar Dados do IP Externo"):
-    with st.spinner("Conectando a serviços de geolocalização públicos..."):
-        client_ip = ""
+    with st.spinner("A ligar a serviços de geolocalização públicos..."):
         
-        # 1. Tenta obter o IP através do recurso nativo do Streamlit (via ligação WebSocket)
-        try:
-            if hasattr(st, "context") and hasattr(st.context, "ip_address") and st.context.ip_address:
-                client_ip = str(st.context.ip_address)
-        except Exception:
+        # Converte o retorno do JavaScript para string ou vazio se falhar
+        client_ip = str(js_ip) if js_ip and js_ip != "0" else ""
+        
+        # Proteção: Se estiver em localhost ou se falhar, limpa a variável 
+        # para que as APIs detetem automaticamente o IP de origem da requisição
+        if client_ip in ["127.0.0.1", "::1", "None", "localhost", "0.0.0.0"]:
             client_ip = ""
 
-        # 2. Se falhar, tenta os cabeçalhos de proxy tradicionais (X-Forwarded-For)
-        if not client_ip:
-            try:
-                headers = st.context.headers
-                forwarded_ip = headers.get("X-Forwarded-For", "") or headers.get("x-forwarded-for", "")
-                if forwarded_ip:
-                    client_ip = forwarded_ip.split(",")[0].strip()
-            except Exception:
-                client_ip = ""
-
-        # Define as URLs passando o IP real do utilizador detetado
+        # Define as URLs passando o IP real do utilizador detetado pelo browser
         url_api1 = f"https://ipapi.co/{client_ip}/json/" if client_ip else "https://ipapi.co/json/"
         url_api2 = f"http://ip-api.com/json/{client_ip}" if client_ip else "http://ip-api.com/json/"
 
@@ -77,7 +72,7 @@ if st.button("Buscar Dados do IP Externo"):
             
             # Alerta informativo útil caso esteja a testar em localhost
             if not client_ip:
-                st.info("ℹ️ Nota: Executando em ambiente local. O sistema usará o IP externo da sua rede atual.")
+                st.info("ℹ️ Nota: A executar em ambiente local ou IP não detetado no browser. O sistema usará o IP de origem da requisição.")
 
             col1, col2 = st.columns(2)
             with col1:
@@ -94,7 +89,7 @@ st.markdown("---")
 
 # 2. Funcionalidade de Port Scan adaptada para Ambiente Web Cloud
 st.subheader("🔍 Passo 2: Verificação de Portas Públicas (Port Scan)")
-st.info("Nota técnica: Como a aplicação está rodando na nuvem, o scanner testará conexões públicas com o IP ou domínio informado.")
+st.info("Nota técnica: Como a aplicação está a correr na nuvem, o scanner testará ligações públicas com o IP ou domínio informado.")
 
 alvo = st.text_input("Digite um domínio ou IP Público para testar (Ex: google.com ou o seu próprio IP público):", "")
 portas_input = st.text_input("Portas para testar (separadas por vírgula):", "21,22,23,80,443,3389")
@@ -105,7 +100,7 @@ if st.button("Iniciar Análise de Portas"):
     else:
         try:
             ip_alvo = socket.gethostbyname(alvo)
-            st.write(f"Analisando o alvo: **{alvo}** ({ip_alvo})")
+            st.write(f"A analisar o alvo: **{alvo}** ({ip_alvo})")
             
             portas = [int(p.strip()) for p in portas_input.split(",") if p.strip().isdigit()]
             portas_abertas = []
