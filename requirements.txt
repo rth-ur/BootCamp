@@ -2,3 +2,6 @@ pytest
 ruff
 typer
 rich
+requests
+streamlit
+streamlit-javascript

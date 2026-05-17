@@ -1,3 +1,5 @@
+from unittest.mock import patch
+import requests
 from src.scanner import scan_ports
 from src.utils import classify_port
 
@@ -13,3 +15,22 @@ def test_classify_port_known():
 
 def test_classify_port_unknown():
     assert classify_port(9999) == ""
+
+
+# Teste de Integração com Mock exigido na Etapa Intermediária
+@patch("requests.get")
+def test_integracao_api_geolocalizacao(mock_get):
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.json.return_value = {
+        "ip": "127.0.0.1",
+        "city": "Brasilia",
+        "region": "Federal District",
+        "country_name": "Brazil",
+        "org": "Provedor Teste"
+    }
+    
+    response = requests.get("https://ipapi.co/json/", timeout=5)
+    assert response.status_code == 200
+    dados = response.json()
+    assert "ip" in dados
+    assert "country_name" in dados

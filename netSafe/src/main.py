@@ -9,11 +9,11 @@ def main():
         return
 
     base_ip = sys.argv[1]
-    
+
     partes_ip = base_ip.split('.')
     if len(partes_ip) != 3:
         print("\n[!] ERRO: Formato de IP inválido!")
-        print("[!] Deves inserir apenas os 3 primeiros blocos (octetos) da rede.")
+        print("[!] Deve inserir apenas os 3 primeiros blocos (octetos) da rede.")
         print("[!] Correto: 192.168.1")
         print("[!] Incorreto: 192.168.1.15\n")
         return

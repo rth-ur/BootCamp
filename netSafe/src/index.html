@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetSafe - Scanner de Rede</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 font-sans leading-normal tracking-normal h-screen flex flex-col">
+    <nav class="bg-blue-800 p-4 shadow-lg">
+        <div class="container mx-auto flex items-center justify-between">
+            <h1 class="text-white text-2xl font-bold">🛡️ NetSafe</h1>
+        </div>
+    </nav>
+
+    <main class="container mx-auto mt-8 p-4 flex-grow">
+        <div class="bg-white p-6 rounded-lg shadow-md max-w-xl mx-auto">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Escanear Rede Local</h2>
+            <div class="flex space-x-2">
+                <input type="text" id="base_ip" placeholder="Ex: 192.168.1"
+                    class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button id="scan_btn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md transition duration-300">
+                    Escanear
+                </button>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">Insira os 3 primeiros octetos da rede.</p>
+        </div>
+
+        <div id="loading" class="hidden text-center mt-8">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-800"></div>
+            <p class="mt-4 text-gray-600 font-medium">A escanear a rede, isto pode demorar alguns minutos...</p>
+        </div>
+
+        <div id="results" class="mt-8 max-w-4xl mx-auto grid gap-6 md:grid-cols-2">
+            <!-- Resultados aparecerão aqui dinamicamente -->
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('scan_btn').addEventListener('click', async () => {
+            const baseIp = document.getElementById('base_ip').value.trim();
+            const resultsDiv = document.getElementById('results');
+            const loadingDiv = document.getElementById('loading');
+            const btn = document.getElementById('scan_btn');
+
+            if (!baseIp) {
+                alert('Por favor, insira um IP base.');
+                return;
+            }
+
+            // Prepara a interface para o modo "Carregando"
+            resultsDiv.innerHTML = '';
+            loadingDiv.classList.remove('hidden');
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                // Faz a chamada à nossa API Python
+                const response = await fetch('/api/scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ base_ip: baseIp })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || 'Ocorreu um erro ao escanear a rede.');
+                    return;
+                }
+
+                if (data.hosts.length === 0) {
+                    resultsDiv.innerHTML = '<div class="col-span-full text-center text-gray-600 bg-white p-4 rounded shadow">Nenhum dispositivo encontrado.</div>';
+                } else {
+                    data.hosts.forEach(host => {
+                        let portsHtml = '';
+                        if (host.ports.length === 0) {
+                            portsHtml = '<li class="text-sm text-gray-500">Nenhuma porta aberta identificada.</li>';
+                        } else {
+                            host.ports.forEach(p => {
+                                portsHtml += `<li class="text-sm"><span class="font-bold text-gray-700">Porta ${p.port}</span> ${p.risk}</li>`;
+                            });
+                        }
+
+                        const card = `
+                            <div class="bg-white p-5 rounded-lg shadow-md border-l-4 border-green-500">
+                                <h3 class="text-lg font-bold text-gray-800 mb-2 border-b pb-2">📡 ${host.ip}</h3>
+                                <ul class="space-y-1 mt-2">
+                                    ${portsHtml}
+                                </ul>
+                            </div>
+                        `;
+                        resultsDiv.innerHTML += card;
+                    });
+                }
+            } catch (error) {
+                alert('Erro na comunicação com a API.');
+            } finally {
+                // Restaura a interface após a resposta
+                loadingDiv.classList.add('hidden');
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        });
+    </script>
+</body>
+
+</html>
