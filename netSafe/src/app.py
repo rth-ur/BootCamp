@@ -23,16 +23,26 @@ st.markdown("Clique no botão abaixo para consumir a API externa e identificar o
 
 if st.button("Buscar Dados do IP Externo"):
     with st.spinner("Conectando a serviços de geolocalização públicos..."):
-        # Descobre o IP real do usuário através do cabeçalho HTTP (Proxy/Forwarded)
+        client_ip = ""
+        
+        # 1. Tenta obter o IP através do recurso nativo do Streamlit (via ligação WebSocket)
         try:
-            headers = st.context.headers
-            # O cabeçalho 'X-Forwarded-For' contém o IP real do cliente que acessa o servidor na nuvem
-            forwarded_ip = headers.get("X-Forwarded-For", "") or headers.get("x-forwarded-for", "")
-            client_ip = forwarded_ip.split(",")[0].strip() if forwarded_ip else ""
+            if hasattr(st, "context") and hasattr(st.context, "ip_address") and st.context.ip_address:
+                client_ip = str(st.context.ip_address)
         except Exception:
             client_ip = ""
 
-        # Define as URLs passando o IP do usuário se ele for encontrado externamente
+        # 2. Se falhar, tenta os cabeçalhos de proxy tradicionais (X-Forwarded-For)
+        if not client_ip:
+            try:
+                headers = st.context.headers
+                forwarded_ip = headers.get("X-Forwarded-For", "") or headers.get("x-forwarded-for", "")
+                if forwarded_ip:
+                    client_ip = forwarded_ip.split(",")[0].strip()
+            except Exception:
+                client_ip = ""
+
+        # Define as URLs passando o IP real do utilizador detetado
         url_api1 = f"https://ipapi.co/{client_ip}/json/" if client_ip else "https://ipapi.co/json/"
         url_api2 = f"http://ip-api.com/json/{client_ip}" if client_ip else "http://ip-api.com/json/"
 
@@ -63,11 +73,11 @@ if st.button("Buscar Dados do IP Externo"):
 
         # Exibe os resultados se alguma das duas APIs funcionar
         if dados and dados.get("ip"):
-            st.success("Dados de geolocalização obtidos com sucesso!")
+            st.success("Dados de geolocalização de rede obtidos com sucesso!")
             
-            # Alerta sutil caso esteja rodando localmente sem cabeçalhos de proxy
+            # Alerta informativo útil caso esteja a testar em localhost
             if not client_ip:
-                st.info("ℹ️ Nota: Mostrando o IP do servidor proxy devido à execução em ambiente de desenvolvimento local.")
+                st.info("ℹ️ Nota: Executando em ambiente local. O sistema usará o IP externo da sua rede atual.")
 
             col1, col2 = st.columns(2)
             with col1:
